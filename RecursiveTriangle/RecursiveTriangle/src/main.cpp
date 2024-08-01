@@ -4,11 +4,16 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <random>
 #include "../include/shader.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
-void triangles(unsigned int& transLoc, glm::vec3 position, glm::mat4 matrix, int level);
+void triangles(unsigned int& transLoc, unsigned int& colorLoc, glm::vec3 position, glm::mat4 matrix, int level);
+
+std::random_device rd;
+std::mt19937 gen(rd());
+std::uniform_real_distribution<float> dis(0.3f, 1.0f);
 
 int main()
 {
@@ -68,7 +73,8 @@ int main()
 
 		unsigned int transLoc = glGetUniformLocation(shader.getID(), "trans");
 		glm::mat4 matrix = glm::mat4(1.0f);
-		triangles(transLoc, glm::vec3(0.0f, -0.5f, 0.0f), matrix, 0);
+		unsigned int colorLoc = glGetUniformLocation(shader.getID(), "color");
+		triangles(transLoc, colorLoc, glm::vec3(0.0f, -0.5f, 0.0f), matrix, 0);
 
 		glBindVertexArray(0);
 
@@ -95,18 +101,21 @@ void processInput(GLFWwindow* window)
 	}
 }
 
-void triangles(unsigned int& transLoc, glm::vec3 position, glm::mat4 matrix, int level)
+void triangles(unsigned int& transLoc, unsigned int& colorLoc, glm::vec3 position, glm::mat4 matrix, int level)
 {
 	if (level >= 9) {
 		return;
 	}
 
+	glm::vec3 colors = glm::vec3(dis(gen), dis(gen), dis(gen));
+
 	matrix = glm::translate(matrix, position);
 	matrix = glm::scale(matrix, glm::vec3(0.5f, 0.5f, 0.0f));
 	glUniformMatrix4fv(transLoc, 1, GL_FALSE, glm::value_ptr(matrix));
+	glUniform3f(colorLoc, colors.r, colors.g, colors.b);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 
-	triangles(transLoc, glm::vec3(-1.0f, -0.5f, 0.0f), matrix, level + 1);
-	triangles(transLoc, glm::vec3(1.0f, -0.5f, 0.0f), matrix, level + 1);
-	triangles(transLoc, glm::vec3(0.0f, 1.5f, 0.0f), matrix, level + 1);
+	triangles(transLoc, colorLoc, glm::vec3(-1.0f, -0.5f, 0.0f), matrix, level + 1);
+	triangles(transLoc, colorLoc, glm::vec3(1.0f, -0.5f, 0.0f), matrix, level + 1);
+	triangles(transLoc, colorLoc, glm::vec3(0.0f, 1.5f, 0.0f), matrix, level + 1);
 }
