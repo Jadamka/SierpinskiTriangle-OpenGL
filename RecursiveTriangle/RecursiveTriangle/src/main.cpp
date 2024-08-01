@@ -35,9 +35,10 @@ int main()
 
 	float vertices[] =
 	{
-		-1.0f, 1.0f, 0.0f,
-		 1.0f, 1.0f, 0.0f,
-		 0.0f, -1.0f, 0.0f
+		// position				// colors
+		-1.0f, 1.0f, 0.0f,		1.0f, 0.0f, 0.0f,
+		 1.0f, 1.0f, 0.0f,		0.0f, 1.0f, 0.0f,
+		 0.0f, -1.0f, 0.0f,		0.0f, 0.0f, 1.0f
 	};
 
 	unsigned int VAO, VBO;
@@ -48,8 +49,10 @@ int main()
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -62,6 +65,7 @@ int main()
 		
 		shader.use();
 		glBindVertexArray(VAO);
+
 		unsigned int transLoc = glGetUniformLocation(shader.getID(), "trans");
 		glm::mat4 matrix = glm::mat4(1.0f);
 		triangles(transLoc, glm::vec3(0.0f, -0.5f, 0.0f), matrix, 0);
@@ -93,7 +97,7 @@ void processInput(GLFWwindow* window)
 
 void triangles(unsigned int& transLoc, glm::vec3 position, glm::mat4 matrix, int level)
 {
-	if (level >= 6) {
+	if (level >= 9) {
 		return;
 	}
 
