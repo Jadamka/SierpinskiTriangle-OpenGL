@@ -7,6 +7,8 @@
 #include <random>
 #include "../include/shader.h"
 
+#define TARGET_FPS 15
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 void triangles(unsigned int& transLoc, unsigned int& colorLoc, glm::vec3 position, glm::mat4 matrix, int level);
@@ -62,10 +64,11 @@ int main()
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+	double lastTime = glfwGetTime();
 	while (!glfwWindowShouldClose(window)) {
 		processInput(window);
 
-		glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+		glClearColor(0.1f, 0.1f, 0.8f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 		
 		shader.use();
@@ -80,6 +83,11 @@ int main()
 
 		glfwPollEvents();
 		glfwSwapBuffers(window);
+
+		while (glfwGetTime() < lastTime + 1.0 / TARGET_FPS) {
+			processInput(window); // not sure if this is good, but it works
+		}
+		lastTime += 1.0 / TARGET_FPS;
 	}
 
 	glDeleteProgram(shader.getID());
